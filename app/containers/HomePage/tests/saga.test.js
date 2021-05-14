@@ -4,30 +4,30 @@
 
 import { put, takeLatest } from 'redux-saga/effects';
 
-import { LOAD_REPOS } from 'containers/App/constants';
-import { reposLoaded, repoLoadingError } from 'containers/App/actions';
+import { LOAD_LOCATION } from 'containers/App/constants';
+import { locationsLoaded, locationLoadingError } from 'containers/App/actions';
 
-import githubData, { getRepos } from '../saga';
+import rootSagaData, { getLocations } from '../saga';
 
-const username = 'mxstbr';
+const username = 'mutikeo';
 
 /* eslint-disable redux-saga/yield-effects */
-describe('getRepos Saga', () => {
-  let getReposGenerator;
+describe('getLocations Saga', () => {
+  let getLocationsGenerator;
 
   // We have to test twice, once for a successful load and once for an unsuccessful one
   // so we do all the stuff that happens beforehand automatically in the beforeEach
   beforeEach(() => {
-    getReposGenerator = getRepos();
+    getLocationsGenerator = getLocations();
 
-    const selectDescriptor = getReposGenerator.next().value;
+    const selectDescriptor = getLocationsGenerator.next().value;
     expect(selectDescriptor).toMatchSnapshot();
 
-    const callDescriptor = getReposGenerator.next(username).value;
+    const callDescriptor = getLocationsGenerator.next(username).value;
     expect(callDescriptor).toMatchSnapshot();
   });
 
-  it('should dispatch the reposLoaded action if it requests the data successfully', () => {
+  it('should dispatch the locationsLoaded action if it requests the data successfully', () => {
     const response = [
       {
         name: 'First repo',
@@ -36,22 +36,24 @@ describe('getRepos Saga', () => {
         name: 'Second repo',
       },
     ];
-    const putDescriptor = getReposGenerator.next(response).value;
-    expect(putDescriptor).toEqual(put(reposLoaded(response, username)));
+    const putDescriptor = getLocationsGenerator.next(response).value;
+    expect(putDescriptor).toEqual(put(locationsLoaded(response, username)));
   });
 
-  it('should call the repoLoadingError action if the response errors', () => {
+  it('should call the locationLoadingError action if the response errors', () => {
     const response = new Error('Some error');
-    const putDescriptor = getReposGenerator.throw(response).value;
-    expect(putDescriptor).toEqual(put(repoLoadingError(response)));
+    const putDescriptor = getLocationsGenerator.throw(response).value;
+    expect(putDescriptor).toEqual(put(locationLoadingError(response)));
   });
 });
 
-describe('githubDataSaga Saga', () => {
-  const githubDataSaga = githubData();
+describe('rootSagaDataSaga Saga', () => {
+  const rootSagaDataSaga = rootSagaData();
 
-  it('should start task to watch for LOAD_REPOS action', () => {
-    const takeLatestDescriptor = githubDataSaga.next().value;
-    expect(takeLatestDescriptor).toEqual(takeLatest(LOAD_REPOS, getRepos));
+  it('should start task to watch for LOAD_LOCATION action', () => {
+    const takeLatestDescriptor = rootSagaDataSaga.next().value;
+    expect(takeLatestDescriptor).toEqual(
+      takeLatest(LOAD_LOCATION, getLocations),
+    );
   });
 });

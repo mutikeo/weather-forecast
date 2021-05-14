@@ -4,7 +4,7 @@
  * This is the first thing users see of our App, at the '/' route
  */
 
-import React, { useEffect, memo } from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -15,46 +15,41 @@ import { createStructuredSelector } from 'reselect';
 import { useInjectReducer } from 'utils/injectReducer';
 import { useInjectSaga } from 'utils/injectSaga';
 import {
-  makeSelectRepos,
+  makeSelectLocations,
   makeSelectLoading,
+  makeSelectLocationLoading,
   makeSelectError,
+  makeSelectWeather,
 } from 'containers/App/selectors';
 import H2 from 'components/H2';
-import ReposList from 'components/ReposList';
-import AtPrefix from './AtPrefix';
+import WeatherList from 'components/WeatherList';
+import AutoComplete from 'components/AutoComplete';
 import CenteredSection from './CenteredSection';
-import Form from './Form';
-import Input from './Input';
 import Section from './Section';
 import messages from './messages';
-import { loadRepos } from '../App/actions';
-import { changeUsername } from './actions';
-import { makeSelectUsername } from './selectors';
+import { loadLocations, loadWeather, resetAll } from '../App/actions';
 import reducer from './reducer';
 import saga from './saga';
 
 const key = 'home';
 
 export function HomePage({
-  username,
   loading,
   error,
-  repos,
-  onSubmitForm,
-  onChangeUsername,
+  locations,
+  locationLoading,
+  weather,
+  onLoadWeather,
+  onChangeLocation,
+  onReset,
 }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
-  useEffect(() => {
-    // When initial state username is not null, submit the form to load repos
-    if (username && username.trim().length > 0) onSubmitForm();
-  }, []);
-
-  const reposListProps = {
+  const weatherListProps = {
     loading,
     error,
-    repos,
+    weather,
   };
 
   return (
@@ -63,7 +58,7 @@ export function HomePage({
         <title>Home Page</title>
         <meta
           name="description"
-          content="A React.js Boilerplate application homepage"
+          content="A React App: get weather info from metaweather.com"
         />
       </Helmet>
       <div>
@@ -77,53 +72,54 @@ export function HomePage({
         </CenteredSection>
         <Section>
           <H2>
-            <FormattedMessage {...messages.trymeHeader} />
+            <FormattedMessage {...messages.projectHeader} />
           </H2>
-          <Form onSubmit={onSubmitForm}>
-            <label htmlFor="username">
-              <FormattedMessage {...messages.trymeMessage} />
-              <AtPrefix>
-                <FormattedMessage {...messages.trymeAtPrefix} />
-              </AtPrefix>
-              <Input
-                id="username"
-                type="text"
-                placeholder="mxstbr"
-                value={username}
-                onChange={onChangeUsername}
-              />
-            </label>
-          </Form>
-          <ReposList {...reposListProps} />
+          <Section>
+            <p>
+              <FormattedMessage {...messages.projectMessage} />
+            </p>
+            <AutoComplete
+              onChange={onChangeLocation}
+              onSelect={onLoadWeather}
+              onReset={onReset}
+              options={locations}
+              isLoading={locationLoading}
+            />
+          </Section>
+          <WeatherList {...weatherListProps} />
         </Section>
       </div>
     </article>
   );
 }
 
+const { bool, oneOfType, object, array, string, func } = PropTypes;
+
 HomePage.propTypes = {
-  loading: PropTypes.bool,
-  error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  repos: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
-  onSubmitForm: PropTypes.func,
-  username: PropTypes.string,
-  onChangeUsername: PropTypes.func,
+  loading: bool,
+  locationLoading: bool,
+  error: oneOfType([object, bool]),
+  locations: oneOfType([array, bool]),
+  onLoadWeather: func,
+  onReset: func,
+  location: string,
+  weather: oneOfType([array, bool]),
+  onChangeLocation: func,
 };
 
 const mapStateToProps = createStructuredSelector({
-  repos: makeSelectRepos(),
-  username: makeSelectUsername(),
+  locations: makeSelectLocations(),
+  locationLoading: makeSelectLocationLoading(),
   loading: makeSelectLoading(),
   error: makeSelectError(),
+  weather: makeSelectWeather(),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onChangeUsername: evt => dispatch(changeUsername(evt.target.value)),
-    onSubmitForm: evt => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(loadRepos());
-    },
+    onChangeLocation: value => dispatch(loadLocations(value.trim())),
+    onLoadWeather: value => dispatch(loadWeather(value)),
+    onReset: () => dispatch(resetAll()),
   };
 }
 
