@@ -1,17 +1,17 @@
-import { CHANGE_USERNAME } from '../constants';
+import { CHANGE_LOCATION } from '../constants';
 
-import { changeUsername } from '../actions';
+import { changeLocation } from '../actions';
 
 describe('Home Actions', () => {
-  describe('changeUsername', () => {
+  describe('changeLocation', () => {
     it('should return the correct type and the passed name', () => {
-      const fixture = 'Max';
+      const location = { title: 'Ho Chi Minh' };
       const expectedResult = {
-        type: CHANGE_USERNAME,
-        username: fixture,
+        type: CHANGE_LOCATION,
+        location,
       };
 
-      expect(changeUsername(fixture)).toEqual(expectedResult);
+      expect(changeLocation(location)).toEqual(expectedResult);
     });
   });
 });

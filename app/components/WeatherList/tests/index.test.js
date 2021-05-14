@@ -27,21 +27,54 @@ describe('<WeatherList />', () => {
       { global: { currentUser: 'mxstbr' } },
       browserHistory,
     );
-    const repos = [
-      {
-        owner: {
-          login: 'mxstbr',
+    const weather = {
+      consolidated_weather: [
+        {
+          id: 6632819783630848,
+          weather_state_name: 'Light Rain',
+          weather_state_abbr: 'lr',
+          wind_direction_compass: 'ENE',
+          created: '2021-05-14T06:42:11.053452Z',
+          applicable_date: '2021-05-14',
+          min_temp: 26.625,
+          max_temp: 33.230000000000004,
+          the_temp: 33.239999999999995,
+          wind_speed: 5.748216122829343,
+          wind_direction: 61.72354333953718,
+          air_pressure: 1007.5,
+          humidity: 65,
+          visibility: 8.705099717648931,
+          predictability: 75,
         },
-        html_url: 'https://github.com/react-boilerplate/react-boilerplate',
-        name: 'react-boilerplate',
-        open_issues_count: 20,
-        full_name: 'react-boilerplate/react-boilerplate',
+      ],
+      time: '2021-05-14T14:59:20.565332+07:00',
+      sun_rise: '2021-05-14T05:53:57.834510+07:00',
+      sun_set: '2021-05-14T17:44:10.138401+07:00',
+      timezone_name: 'LMT',
+      parent: {
+        title: 'Indonesia',
+        location_type: 'Country',
+        woeid: 23424846,
+        latt_long: '0.109740,113.917397',
       },
-    ];
+      sources: [
+        {
+          title: 'BBC',
+          slug: 'bbc',
+          url: 'http://www.bbc.co.uk/weather/',
+          crawl_rate: 360,
+        },
+      ],
+      title: 'Jakarta',
+      location_type: 'City',
+      woeid: 1047378,
+      latt_long: '-6.171440,106.827820',
+      timezone: 'Asia/Jakarta',
+    };
     const { container } = render(
       <Provider store={store}>
         <IntlProvider locale="en">
-          <WeatherList repos={repos} error={false} />
+          <WeatherList weather={weather} error={false} />
         </IntlProvider>
       </Provider>,
     );
@@ -51,7 +84,7 @@ describe('<WeatherList />', () => {
 
   it('should not render anything if nothing interesting is provided', () => {
     const { container } = render(
-      <WeatherList repos={false} error={false} loading={false} />,
+      <WeatherList weather={false} error={false} loading={false} />,
     );
 
     expect(container.firstChild).toBeNull();

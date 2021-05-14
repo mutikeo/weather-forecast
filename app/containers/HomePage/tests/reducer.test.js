@@ -1,14 +1,14 @@
 import produce from 'immer';
 
 import homeReducer from '../reducer';
-import { changeUsername } from '../actions';
+import { changeLocation } from '../actions';
 
 /* eslint-disable default-case, no-param-reassign */
 describe('homeReducer', () => {
   let state;
   beforeEach(() => {
     state = {
-      username: '',
+      location: '',
     };
   });
 
@@ -17,12 +17,14 @@ describe('homeReducer', () => {
     expect(homeReducer(undefined, {})).toEqual(expectedResult);
   });
 
-  it('should handle the changeUsername action correctly', () => {
-    const fixture = 'mxstbr';
+  it('should handle the changeLocation action correctly', () => {
+    const location = { title: 'Ho Chi Minh city' };
     const expectedResult = produce(state, draft => {
-      draft.username = fixture;
+      draft.location = location;
     });
 
-    expect(homeReducer(state, changeUsername(fixture))).toEqual(expectedResult);
+    expect(homeReducer(state, changeLocation(location))).toEqual(
+      expectedResult,
+    );
   });
 });
